@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxHttpUtils-master\src\ofxHttpUtils.cpp">
+			<Filter>addons\ofxHttpUtils-master\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxJSON-master\src\ofxJSONElement.cpp">
+			<Filter>addons\ofxJSON-master\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxJSON-master\libs\jsoncpp\src\jsoncpp.cpp">
+			<Filter>addons\ofxJSON-master\libs\jsoncpp\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp">
+			<Filter>addons\ofxXmlSettings\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp">
+			<Filter>addons\ofxXmlSettings\libs</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp">
+			<Filter>addons\ofxXmlSettings\libs</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp">
+			<Filter>addons\ofxXmlSettings\libs</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxHttpUtils-master">
+			<UniqueIdentifier>{C899212D-6769-2BED-706C-7926}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxHttpUtils-master\src">
+			<UniqueIdentifier>{D6E7722B-DC08-F375-E559-B453}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master">
+			<UniqueIdentifier>{EC8814B8-9630-4FB5-38ED-CAAD}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\src">
+			<UniqueIdentifier>{C7A086C0-22E5-4A70-87F1-73F5}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\libs">
+			<UniqueIdentifier>{B637EBF1-4422-2CC1-6991-33CF}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\libs\jsoncpp">
+			<UniqueIdentifier>{2DB2A52E-8F91-8A37-C94D-7981}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\libs\jsoncpp\include">
+			<UniqueIdentifier>{8072CE4B-5B27-3353-320C-3B04}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\libs\jsoncpp\include\json">
+			<UniqueIdentifier>{C82BEC39-6AFA-3790-2293-AE90}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxJSON-master\libs\jsoncpp\src">
+			<UniqueIdentifier>{133D470F-C0AC-6264-BF9D-89CB}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxXmlSettings">
+			<UniqueIdentifier>{877F005D-13E6-0592-1D97-F2E3}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxXmlSettings\src">
+			<UniqueIdentifier>{CCB2AC63-49D2-977C-CFE8-AEAD}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxXmlSettings\libs">
+			<UniqueIdentifier>{687714A8-1662-FA1C-261F-50F0}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\FrameTimer.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\Parameter.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\StringUtil.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxHttpUtils-master\src\ofxHttpTypes.h">
+			<Filter>addons\ofxHttpUtils-master\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxHttpUtils-master\src\ofxHttpUtils.h">
+			<Filter>addons\ofxHttpUtils-master\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxJSON-master\src\ofxJSON.h">
+			<Filter>addons\ofxJSON-master\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxJSON-master\src\ofxJSONElement.h">
+			<Filter>addons\ofxJSON-master\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxJSON-master\libs\jsoncpp\include\json\json-forwards.h">
+			<Filter>addons\ofxJSON-master\libs\jsoncpp\include\json</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxJSON-master\libs\jsoncpp\include\json\json.h">
+			<Filter>addons\ofxJSON-master\libs\jsoncpp\include\json</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h">
+			<Filter>addons\ofxXmlSettings\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
+			<Filter>addons\ofxXmlSettings\libs</Filter>
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="icon.rc" />
+	</ItemGroup>
+</Project>

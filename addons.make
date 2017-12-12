@@ -1,0 +1,3 @@
+ofxHttpUtils-master
+ofxJSON-master
+ofxXmlSettings
