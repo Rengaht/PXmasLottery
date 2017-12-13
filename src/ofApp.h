@@ -32,12 +32,15 @@ class ofApp : public ofBaseApp{
 		enum LMODE {SLEEP,ROLL,FINAL};
 		LMODE _mode;
 		
-		FrameTimer _timer_blink;		
+		FrameTimer _timer_blink[3];		
 		FrameTimer _timer_roll[3];		
 		FrameTimer _timer_final;
 
-		int _dest_roll[3];
+		float _dest_roll[3];
+		float _src_roll[3];
 		float _pos_roll[3];
+
+		float _vel_roll[3];
 		
 		void changeMode(LMODE set_);
 
@@ -54,7 +57,7 @@ class ofApp : public ofBaseApp{
 		void getPrize();
 		void setPrize(string prize_);
 		
-		void sendPrint(string prize_);
+		void sendPrint(wstring prize_);
 
 		ofSerial _serial;
 		void sendBalloon(bool up_);
@@ -65,4 +68,7 @@ class ofApp : public ofBaseApp{
 		ofxHttpUtils _http_util;
 		void httpResponse(ofxHttpResponse & response);
 		
+		int _got_prize;
+		bool _wait_print;
+		wstring _print_text;
 };

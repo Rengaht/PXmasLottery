@@ -2,7 +2,7 @@
 #ifndef PARMAMETR_H
 #define PARAMETER_H
 
-
+#include <codecvt>
 #include "ofMain.h"
 #include "ofxXmlSettings.h"
 
@@ -15,13 +15,22 @@ public:
     
 	vector<string> _prize_id;
 	vector<ofImage> _prize_img;
-	vector<string> _port;
+	vector<ofImage> _prize_img_name;
+	vector<wstring> _prize_print;
 
+	vector<string> _port;
+	
 	string _lottery_url;
+	string _print_folder;
 
 
 	int _mprize;
 	int _mrolling;
+
+
+	int _time_roll;
+	int _time_final;
+
 
 	Param(){
 		readParam();
@@ -34,6 +43,14 @@ public:
 	}
 	void readParam(){
 
+		_prize_id.clear();
+		_prize_img.clear();
+		_prize_img_name.clear();
+		_prize_print.clear();
+		
+		_port.clear();
+		
+
 
 		ofxXmlSettings _param;
 		bool file_exist=true;
@@ -45,23 +62,40 @@ public:
 		}
 
 
-		_port.clear();
 	
+		
         int mport=_param.getNumTags("PORT");
 		for(int i=0;i<mport;++i){
 			_port.push_back(_param.getValue("PORT","",i));
 		}
 
+		
+
 		_mprize=_param.getNumTags("IMG");
 		for(int i=0;i<_mprize;++i){
-			_prize_id.push_back(_param.getAttribute("IMG","id","",i));		
+			_prize_id.push_back(_param.getAttribute("IMG","id","",i));	
+			string str_=_param.getAttribute("IMG","print","",i);			
+			//_prize_print.push_back(wstring(str_.begin(),str_.end()));
+			_prize_print.push_back(utf82ws(str_));
 
 			ofImage img_;
 			img_.load(_param.getValue("IMG","",i));
 			_prize_img.push_back(img_);
+
+
+			ofImage nimg_;
+			string name_=_param.getAttribute("IMG","name","",i);
+			if(name_!="") nimg_.load(name_);
+			_prize_img_name.push_back(nimg_);
+
 		}
 		
 		_lottery_url=_param.getValue("LOTTERY_URL","");
+		_print_folder=_param.getValue("PRINT_FOLDER","");
+
+
+		_time_roll=_param.getValue("TIME_ROLL",0);
+		_time_final=_param.getValue("TIME_FINAL",0);
 
 		_mrolling=2;
 
@@ -69,6 +103,17 @@ public:
 
 	
 	}
+	string ws2utf8(std::wstring &input){
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
+		return utf8conv.to_bytes(input);
+	}
+
+	wstring utf82ws(std::string &input)
+	{
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8conv;
+		return utf8conv.from_bytes(input);
+	}
+
 	void saveParameterFile(){
 
 
@@ -81,7 +126,12 @@ public:
 			_param.setValue("IMG",_prize_id[i],i);						
 		}
 		
-		_param.setValue("LOTTERY_URL","");
+		_param.setValue("LOTTERY_URL",_lottery_url);
+		_param.setValue("PRINT_FOLDER",_print_folder);
+
+		_param.setValue("TIME_ROLL",_time_roll);
+		_param.setValue("TIME_FINAL",_time_final);
+
 
 		_param.save(ParamFilePath);
 

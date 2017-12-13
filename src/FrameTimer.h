@@ -83,6 +83,19 @@ public:
 		float p=val();
 		return sin(p *HALF_PI);
 	}
+	float valFade(){
+		float d_=.05;
+		float p=val();
+		if(p<d_){
+			return sin(p/d_*HALF_PI);
+		}else if(p>1.0-d_){
+			return 1.0-sin((p-(1.0-d_))/d_*HALF_PI);
+		}else{
+			return 1;
+		}
+	}
+	
+
 
 private:
 	float ani_t;
