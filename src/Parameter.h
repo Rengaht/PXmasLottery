@@ -31,6 +31,9 @@ public:
 	int _time_roll;
 	int _time_final;
 
+	string _port_light;
+	string _port_balloon;
+	string _port_walk;
 
 	Param(){
 		readParam();
@@ -97,6 +100,11 @@ public:
 		_time_roll=_param.getValue("TIME_ROLL",0);
 		_time_final=_param.getValue("TIME_FINAL",0);
 
+		_port_light=_param.getValue("LIGHT_PORT","");
+		_port_walk=_param.getValue("WALK_PORT","");
+		_port_balloon=_param.getValue("BALLOON_PORT","");
+
+
 		_mrolling=2;
 
 		if(!file_exist) saveParameterFile();
@@ -132,6 +140,9 @@ public:
 		_param.setValue("TIME_ROLL",_time_roll);
 		_param.setValue("TIME_FINAL",_time_final);
 
+		_param.setValue("LIGHT_PORT",_port_light);
+		_param.setValue("WALK_PORT",_port_walk);
+		_param.setValue("BALLOON_PORT",_port_balloon);
 
 		_param.save(ParamFilePath);
 
@@ -146,3 +157,4 @@ public:
 
 
 #endif
+

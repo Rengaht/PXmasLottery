@@ -7,6 +7,11 @@
 #include "ofxHttpUtils.h"
 #include "ofxJSON.h"
 
+#define CircleRad 273.0
+#define CircleX 34.0
+#define CircleY 40.0
+#define CircleMargin 68.0
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -29,7 +34,7 @@ class ofApp : public ofBaseApp{
 		Param* _param;
 		float _cur_millis;
 
-		enum LMODE {SLEEP,ROLL,FINAL};
+		enum LMODE {SLEEP,ROLL,FINAL,WIN,LOSE};
 		LMODE _mode;
 		
 		FrameTimer _timer_blink[3];		
@@ -53,14 +58,20 @@ class ofApp : public ofBaseApp{
 
 		ofImage _img_hint;
 		ofImage _img_sleep;
+		ofImage _img_lose;
+
 
 		void getPrize();
 		void setPrize(string prize_);
 		
 		void sendPrint(wstring prize_);
 
-		ofSerial _serial;
+		ofSerial _serial_balloon;
+		ofSerial _serial_light;
+		ofSerial _serial_walk;
+
 		void sendBalloon(bool up_);
+		void sendLight(LMODE mode_);
 
 		ofFbo _mask;
 		

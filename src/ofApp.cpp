@@ -13,7 +13,7 @@ void ofApp::setup(){
 		_timer_roll[i]=FrameTimer(_param->_time_roll+100*i,50*i);
 
 		_pos_roll[i]=floor(ofRandom(_param->_mprize));
-		_vel_roll[i]=ofRandom(1,2)*.001;
+		_vel_roll[i]=ofRandom(1,2)*.002;
 	}
 
 	ofAddListener(_timer_roll[2].finish_event,this,&ofApp::onRollEnd);
@@ -27,9 +27,12 @@ void ofApp::setup(){
 
 	_img_sleep.load("00_pull.png");
 	_img_hint.load("00_pull_text.png");
+	_img_lose.load("13_unlucky.png");
 
 	//setup serial
-
+	_serial_balloon.setup(_param->_port_balloon,9600);
+	_serial_light.setup(_param->_port_light,9600);
+	_serial_walk.setup(_param->_port_walk,9600);
 
 	//setup mask
 	_mask.allocate(ofGetWidth(),ofGetHeight());
@@ -37,12 +40,11 @@ void ofApp::setup(){
 		ofClear(200,255);
 		ofDisableAlphaBlending();
 		ofSetCircleResolution(100);
-		float rad_=ofGetWidth()/3*.8;
-		float px_=ofGetWidth()/3*.1;
-		float py_=50;
-		ofSetColor(0,0);
-		for(int i=0;i<3;++i) ofDrawCircle((px_*2+rad_)*i+px_+rad_/2,py_+rad_/2,rad_/2);
 		
+		ofSetColor(0,0);
+		for(int i=0;i<3;++i){			
+			ofDrawCircle(CircleX+(CircleMargin+CircleRad)*i+CircleRad/2,CircleY+CircleRad/2,CircleRad/2);
+		}
 	_mask.end();
 	
 	ofAddListener(_http_util.newResponseEvent,this,&ofApp::httpResponse);
@@ -89,18 +91,27 @@ void ofApp::changeMode(LMODE set_){
 
 	switch(set_){
 		case SLEEP:
-			for(int i=0;i<3;++i) _timer_blink[i].restart();
+			for(int i=0;i<3;++i){
+				_timer_blink[i].restart();
+				_vel_roll[i]=ofRandom(1,2)*.001;
+			}
 			_mode=set_;
+			sendLight(LMODE::SLEEP);
 			
 			break;
 		case ROLL:
 			getPrize();
+			sendLight(LMODE::ROLL);
+
 			break;
 		case FINAL:
 			for(int i=0;i<3;++i) _timer_blink[i].restart();
 			_timer_final.restart();
 
 			_mode=set_;
+
+			if(_got_prize>-1) sendLight(LMODE::WIN);
+			else sendLight(LMODE::LOSE);
 
 			break;
 	}
@@ -152,11 +163,12 @@ void ofApp::draw(){
 				int index_=(int)(floor(_pos_roll[i]))%_param->_mprize;
 				drawInCircle(i,_param->_prize_img[index_]);
 			
-				if(_got_prize>-1 && _timer_blink[i].num()%2==1){
-
+				if(_timer_blink[i].num()%2==1){
+					
 					ofPushStyle();
 					ofSetColor(255,255.0*_timer_blink[i].valFade());
-						drawInCircle(i,_param->_prize_img_name[index_]);
+						if(_got_prize>-1) drawInCircle(i,_param->_prize_img_name[index_]);
+						else drawInCircle(i,_img_lose);
 					ofPopStyle();
 				}
 			}
@@ -186,11 +198,7 @@ void ofApp::drawInCircle(int index_,ofImage& img_){
 }
 void ofApp::drawInCircle(int index_,ofImage& img_,float part_){
 	
-	float rad_=ofGetWidth()/3*.8;
-	float px_=ofGetWidth()/3*.1;
-	float py_=50;
-
-	img_.draw((px_*2+rad_)*index_+px_,py_+rad_*part_,rad_,rad_);
+	img_.draw(CircleX+(CircleMargin+CircleRad)*index_,CircleY+CircleRad*part_,CircleRad,CircleRad);
 }
 
 //--------------------------------------------------------------
@@ -282,8 +290,8 @@ void ofApp::setPrize(string prize_){
 				_dest_roll[i]=(_param->_mprize-_src_roll[i])
 							 +(i+_param->_mrolling)*_param->_mprize+dest_;		
 				
-				cout<<"src= "<<_src_roll[i]<<"  delta= "<<_dest_roll[i]
-					<<"dest= "<<_src_roll[i]+_dest_roll[i]<<endl;
+				//cout<<"src= "<<_src_roll[i]<<"  delta= "<<_dest_roll[i]
+				//	<<"dest= "<<_src_roll[i]+_dest_roll[i]<<endl;
 
 				
 			}
@@ -330,8 +338,27 @@ void ofApp::sendPrint(wstring prize_){
 
 void ofApp::sendBalloon(bool up_){
 
-
+	if(up_){
+		//_serial_balloon
+	}else{
+	
+	}
 }
+void ofApp::sendLight(LMODE mode_){
+	switch(mode_){
+		case SLEEP:
+			//_serial_light
+			break;
+		case ROLL:
+			break;
+		case WIN:
+			break;
+		case LOSE:
+			break;	
+	}
+}
+
+
 
 void ofApp::httpResponse(ofxHttpResponse & response){
 	/*ofLog()<<ofToString(response.status)<<" : "
@@ -344,6 +371,8 @@ void ofApp::httpResponse(ofxHttpResponse & response){
 	}else if(!json_["prize"].empty()){
 		ofLog()<<"get prize: "<<json_["prize"].asString();
 		setPrize(json_["prize"].asString());
+		//setPrize("noprize");
+
 	}else{
 		ofLog()<<"something wrong...";
 	}
