@@ -28,7 +28,9 @@ public:
 	int _mrolling;
 
 
-	int _time_roll;
+	int _time_roll_win;
+	int _time_roll_lose;
+
 	int _time_final;
 
 	string _port_light;
@@ -97,7 +99,9 @@ public:
 		_print_folder=_param.getValue("PRINT_FOLDER","");
 
 
-		_time_roll=_param.getValue("TIME_ROLL",0);
+		_time_roll_win=_param.getValue("TIME_ROLL_WIN",0);
+		_time_roll_lose=_param.getValue("TIME_ROLL_LOSE",0);
+
 		_time_final=_param.getValue("TIME_FINAL",0);
 
 		_port_light=_param.getValue("LIGHT_PORT","");
@@ -137,7 +141,9 @@ public:
 		_param.setValue("LOTTERY_URL",_lottery_url);
 		_param.setValue("PRINT_FOLDER",_print_folder);
 
-		_param.setValue("TIME_ROLL",_time_roll);
+		_param.setValue("TIME_ROLL_WIN",_time_roll_win);
+		_param.setValue("TIME_ROLL_LOSE",_time_roll_lose);
+
 		_param.setValue("TIME_FINAL",_time_final);
 
 		_param.setValue("LIGHT_PORT",_port_light);

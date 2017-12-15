@@ -4,13 +4,15 @@
 void ofApp::setup(){
 
 
+	ofSetVerticalSync(true);
+
 	_param=new Param();
 
 	for(int i=0;i<3;++i){
 		_timer_blink[i]=FrameTimer(1200,300*i);
 		_timer_blink[i].setContinuous(true);
 		
-		_timer_roll[i]=FrameTimer(_param->_time_roll+100*i,50*i);
+		_timer_roll[i]=FrameTimer(_param->_time_roll_win+100*i,50*i);
 
 		_pos_roll[i]=floor(ofRandom(_param->_mprize));
 		_vel_roll[i]=ofRandom(1,2)*.002;
@@ -21,7 +23,7 @@ void ofApp::setup(){
 	_timer_final=FrameTimer(_param->_time_final);
 	ofAddListener(_timer_final.finish_event,this,&ofApp::onFinalEnd);
 
-	changeMode(LMODE::SLEEP);
+
 	_cur_millis=ofGetElapsedTimeMillis();
 
 
@@ -53,6 +55,27 @@ void ofApp::setup(){
 	_wait_print=false;
 	_got_prize=false;
 
+
+	_bgm_sleep.load("sound/bgm.wav");
+	_bgm_sleep.setLoop(true);
+	_bgm_sleep.play();
+	
+
+	_bgm_roll.load("sound/roll_loop.wav");
+	_bgm_roll.setLoop(true);
+	_bgm_roll.play();
+
+	_sound_london.load("sound/announcement.mp3");
+	_sound_win.load("sound/win.wav");
+	_sound_lose.load("sound/lose.wav");
+	_sound_trigger.load("sound/start.wav");
+	
+	_timer_bgm=FrameTimer(3000);
+
+
+	changeMode(LMODE::SLEEP);
+
+
 }
 
 //--------------------------------------------------------------
@@ -81,9 +104,12 @@ void ofApp::update(){
 			for(int i=0;i<3;++i){
 				_timer_blink[i].update(dm);
 			}
-			_timer_final.update(dm);
+			_timer_final.update(dm);			
 			break;
 	}
+	ofSoundUpdate();
+	updateBgm(dm);
+
 	ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
 
@@ -97,21 +123,35 @@ void ofApp::changeMode(LMODE set_){
 			}
 			_mode=set_;
 			sendLight(LMODE::SLEEP);
+			_timer_bgm.restart();			
 			
 			break;
 		case ROLL:
+			_sound_trigger.play();
 			getPrize();
 			sendLight(LMODE::ROLL);
 
 			break;
 		case FINAL:
+			_mode=set_;
+
+			if(_got_prize>-1){
+				sendLight(LMODE::WIN);
+				if(_got_prize==0){
+					_sound_london.play();
+					_timer_final.setDue(40000+_param->_time_final);
+				}else{
+					_sound_win.play();
+					_timer_final.setDue(_param->_time_final);
+				}
+			}else{
+				sendLight(LMODE::LOSE);
+				_sound_lose.play();
+			}
 			for(int i=0;i<3;++i) _timer_blink[i].restart();
 			_timer_final.restart();
 
-			_mode=set_;
-
-			if(_got_prize>-1) sendLight(LMODE::WIN);
-			else sendLight(LMODE::LOSE);
+			_timer_bgm.reset();		
 
 			break;
 	}
@@ -204,7 +244,7 @@ void ofApp::drawInCircle(int index_,ofImage& img_,float part_){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	switch(key){
-		case 'a':
+		case ' ':
 			if(_mode==LMODE::SLEEP) changeMode(LMODE::ROLL);
 			break;
 	}
@@ -321,6 +361,9 @@ void ofApp::setPrize(string prize_){
 	}
 
 	for(int i=0;i<3;++i){
+		_timer_roll[i].setDue(((_got_prize>-1)?_param->_time_roll_win:_param->_time_roll_lose)
+								+RollDelay*i);
+		
 		_timer_roll[i].restart();
 	}
 	_mode=LMODE::ROLL;
@@ -339,21 +382,24 @@ void ofApp::sendPrint(wstring prize_){
 void ofApp::sendBalloon(bool up_){
 
 	if(up_){
-		//_serial_balloon
+		_serial_balloon.writeByte('1');
 	}else{
-	
+		_serial_balloon.writeByte('0');
 	}
 }
 void ofApp::sendLight(LMODE mode_){
 	switch(mode_){
 		case SLEEP:
-			//_serial_light
+			_serial_light.writeByte('c');
 			break;
 		case ROLL:
+			_serial_light.writeByte('e');
 			break;
 		case WIN:
+			_serial_light.writeByte('a');
 			break;
 		case LOSE:
+			_serial_light.writeByte('b');
 			break;	
 	}
 }
@@ -370,11 +416,49 @@ void ofApp::httpResponse(ofxHttpResponse & response){
 		ofLog()<<json_["error"].asString();
 	}else if(!json_["prize"].empty()){
 		ofLog()<<"get prize: "<<json_["prize"].asString();
+		
 		setPrize(json_["prize"].asString());
 		//setPrize("noprize");
 
 	}else{
 		ofLog()<<"something wrong...";
+	}
+
+}
+
+
+
+void ofApp::updateBgm(float dt_){
+	
+	_timer_bgm.update(dt_);
+	
+	
+	float p=_timer_bgm.val();
+	switch(_mode){
+		case SLEEP:
+			_bgm_sleep.setVolume(1.0);
+			_bgm_roll.setVolume(0.0);
+			break;
+		case ROLL:
+			p=_timer_roll[2].val();
+			if(p<=.1){
+				_bgm_sleep.setVolume(1.0-p*10);
+				_bgm_roll.setVolume(p*10);
+			}else if(p>=.9) _bgm_roll.setVolume(1.0-10*(p-.9));		
+			break;
+		case FINAL:
+			if(!_timer_bgm.isStart()){
+
+				//if(_got_prize>0) ofLog()<<_sound_win.getPosition();
+
+				if((_got_prize==0 && _sound_london.getPosition()>=0.95)
+					||(_got_prize>0 && _sound_win.getPosition()>=0.95)
+					||(_got_prize<0 && _sound_lose.getPosition()>=0.95)){
+					_timer_bgm.restart();
+				}
+			}
+			_bgm_sleep.setVolume(p);			
+			break;
 	}
 
 }

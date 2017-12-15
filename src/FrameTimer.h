@@ -94,7 +94,9 @@ public:
 			return 1;
 		}
 	}
-	
+	bool isStart(){
+		return started;
+	}
 
 
 private:

@@ -7,10 +7,12 @@
 #include "ofxHttpUtils.h"
 #include "ofxJSON.h"
 
-#define CircleRad 273.0
-#define CircleX 34.0
-#define CircleY 40.0
-#define CircleMargin 68.0
+#define CircleRad 341.0
+#define CircleX 43.5
+#define CircleY 189.5
+#define CircleMargin 85.0
+
+#define RollDelay 200
 
 class ofApp : public ofBaseApp{
 
@@ -82,4 +84,18 @@ class ofApp : public ofBaseApp{
 		int _got_prize;
 		bool _wait_print;
 		wstring _print_text;
+
+		ofSoundPlayer _bgm_sleep;
+		ofSoundPlayer _bgm_roll;
+
+		ofSoundPlayer _sound_london;
+		ofSoundPlayer _sound_win;
+		ofSoundPlayer _sound_lose;
+		ofSoundPlayer _sound_trigger;
+
+		
+		void updateBgm(float dt_);
+		FrameTimer _timer_bgm;
+		bool _bgm_dir;
+
 };
