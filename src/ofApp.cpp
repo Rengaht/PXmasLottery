@@ -5,6 +5,7 @@ void ofApp::setup(){
 
 
 	ofSetVerticalSync(true);
+	//ofSetFullscreen(true);
 
 	_param=new Param();
 
@@ -74,12 +75,15 @@ void ofApp::setup(){
 
 
 	changeMode(LMODE::SLEEP);
-
+	
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+
+	updateSerial();
 
 	float dm=ofGetElapsedTimeMillis()-_cur_millis;
 	_cur_millis+=dm;
@@ -100,17 +104,36 @@ void ofApp::update(){
 			}
 		//	cout<<endl;
 			break;
-		case FINAL:
+		case FINAL:			
 			for(int i=0;i<3;++i){
+				if(_got_prize>-1) _pos_roll[i]=_got_prize;
 				_timer_blink[i].update(dm);
 			}
 			_timer_final.update(dm);			
 			break;
 	}
+	
+	
 	ofSoundUpdate();
 	updateBgm(dm);
 
 	ofSetWindowTitle(ofToString(ofGetFrameRate()));
+
+}
+
+void ofApp::updateSerial(){
+
+	if(_serial_walk.isInitialized() && _serial_walk.available()){
+
+		vector<string> val=readSerialString(_serial_walk,'#');
+		if(val.size()<1) return;
+		ofLog()<<"serial read: "<<val[0];
+
+	
+		if(val[0]=="go"){
+			if(_mode==LMODE::SLEEP) changeMode(LMODE::ROLL);
+		}	
+	}
 }
 
 void ofApp::changeMode(LMODE set_){
@@ -144,11 +167,21 @@ void ofApp::changeMode(LMODE set_){
 					_sound_win.play();
 					_timer_final.setDue(_param->_time_final);
 				}
+				
+				for(int i=0;i<3;++i){
+					_pos_roll[i]=_got_prize;
+					_src_roll[i]=_dest_roll[i]=0;					
+				}
+
 			}else{
 				sendLight(LMODE::LOSE);
 				_sound_lose.play();
 			}
-			for(int i=0;i<3;++i) _timer_blink[i].restart();
+
+			for(int i=0;i<3;++i){
+				_timer_roll[i].reset();
+				_timer_blink[i].restart();
+			}
 			_timer_final.restart();
 
 			_timer_bgm.reset();		
@@ -161,19 +194,19 @@ void ofApp::changeMode(LMODE set_){
 
 void ofApp::onRollEnd(int &data){
 	if(_mode==LMODE::ROLL){
-		changeMode(LMODE::FINAL);
-
-		if(_got_prize>-1){
-			for(int i=0;i<3;++i) _pos_roll[i]=_got_prize;
-		}
-		if(_wait_print){
+			
+  		if(_wait_print){
 			sendPrint(_print_text);
 			_wait_print=false;
 		}
+
+		changeMode(LMODE::FINAL);
 	}
 }
 void ofApp::onFinalEnd(int &data){
 	changeMode(LMODE::SLEEP);
+
+	_timer_final.reset();
 }
 
 //--------------------------------------------------------------
@@ -217,7 +250,12 @@ void ofApp::draw(){
 
 	
 	
+	
 	_mask.draw(0,0);
+
+	/*for(int i=0;i<3;++i){	
+		ofDrawBitmapString(ofToString(_pos_roll[i]),CircleX+(CircleMargin+CircleRad)*i,CircleY-20);
+	}*/
 }
 void ofApp::drawCircles(){
 	for(int i=0;i<3;++i){
@@ -239,6 +277,7 @@ void ofApp::drawInCircle(int index_,ofImage& img_){
 void ofApp::drawInCircle(int index_,ofImage& img_,float part_){
 	
 	img_.draw(CircleX+(CircleMargin+CircleRad)*index_,CircleY+CircleRad*part_,CircleRad,CircleRad);
+	
 }
 
 //--------------------------------------------------------------
@@ -246,6 +285,10 @@ void ofApp::keyPressed(int key){
 	switch(key){
 		case ' ':
 			if(_mode==LMODE::SLEEP) changeMode(LMODE::ROLL);
+			break;
+		case 'f':
+		case 'F':
+			ofToggleFullscreen();
 			break;
 	}
 }

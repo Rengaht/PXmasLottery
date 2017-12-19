@@ -3,14 +3,15 @@
 #include "ofMain.h"
 #include "FrameTimer.h"
 #include "Parameter.h"
+#include "StringUtil.h"
 
 #include "ofxHttpUtils.h"
 #include "ofxJSON.h"
 
-#define CircleRad 341.0
-#define CircleX 43.5
-#define CircleY 189.5
-#define CircleMargin 85.0
+#define CircleRad 367.66
+#define CircleX 245
+#define CircleY 355.2
+#define CircleMargin 163.51
 
 #define RollDelay 200
 
@@ -72,6 +73,8 @@ class ofApp : public ofBaseApp{
 		ofSerial _serial_light;
 		ofSerial _serial_walk;
 
+		void updateSerial();
+
 		void sendBalloon(bool up_);
 		void sendLight(LMODE mode_);
 
@@ -97,5 +100,7 @@ class ofApp : public ofBaseApp{
 		void updateBgm(float dt_);
 		FrameTimer _timer_bgm;
 		bool _bgm_dir;
+
+
 
 };
