@@ -18,11 +18,10 @@ public:
 	vector<ofImage> _prize_img_name;
 	vector<wstring> _prize_print;
 
-	vector<string> _port;
 	
 	string _lottery_url;
 	string _print_folder;
-
+	wstring _xmas_string;
 
 	int _mprize;
 	int _mrolling;
@@ -33,7 +32,7 @@ public:
 
 	int _time_final;
 
-	string _port_light;
+	vector<string> _port_light;
 	string _port_balloon;
 	string _port_walk;
 
@@ -53,8 +52,7 @@ public:
 		_prize_img_name.clear();
 		_prize_print.clear();
 		
-		_port.clear();
-		
+		_port_light.clear();	
 
 
 		ofxXmlSettings _param;
@@ -67,13 +65,11 @@ public:
 		}
 
 
-	
-		
-        int mport=_param.getNumTags("PORT");
-		for(int i=0;i<mport;++i){
-			_port.push_back(_param.getValue("PORT","",i));
+		int mlightport=_param.getNumTags("LIGHT_PORT");
+		for(int i=0;i<mlightport;++i){
+			_port_light.push_back(_param.getValue("LIGHT_PORT","",i));
 		}
-
+        
 		
 
 		_mprize=_param.getNumTags("IMG");
@@ -104,12 +100,13 @@ public:
 
 		_time_final=_param.getValue("TIME_FINAL",0);
 
-		_port_light=_param.getValue("LIGHT_PORT","");
+		//_port_light=_param.getValue("LIGHT_PORT","");
 		_port_walk=_param.getValue("WALK_PORT","");
 		_port_balloon=_param.getValue("BALLOON_PORT","");
 
+		_xmas_string=utf82ws(_param.getValue("XMAS_STRING",""));
 
-		_mrolling=2;
+		_mrolling=5;
 
 		if(!file_exist) saveParameterFile();
 
@@ -131,9 +128,7 @@ public:
 
 		ofxXmlSettings _param;
       
-        for(int i=0;i<_port.size();++i){
-			_param.setValue("PORT",_port[i],i);
-		}
+  
 		for(int i=0;i<_prize_id.size();++i){
 			_param.setValue("IMG",_prize_id[i],i);						
 		}
@@ -146,7 +141,9 @@ public:
 
 		_param.setValue("TIME_FINAL",_time_final);
 
-		_param.setValue("LIGHT_PORT",_port_light);
+		for(int i=0;i<_port_light.size();++i)
+			_param.setValue("LIGHT_PORT",_port_light[i],i);
+
 		_param.setValue("WALK_PORT",_port_walk);
 		_param.setValue("BALLOON_PORT",_port_balloon);
 

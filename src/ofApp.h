@@ -7,6 +7,9 @@
 
 #include "ofxHttpUtils.h"
 #include "ofxJSON.h"
+#include "ofxNetwork.h"
+
+
 
 #define CircleRad 367.66
 #define CircleX 245
@@ -70,7 +73,7 @@ class ofApp : public ofBaseApp{
 		void sendPrint(wstring prize_);
 
 		ofSerial _serial_balloon;
-		ofSerial _serial_light;
+		vector<ofSerial*> _serial_light;
 		ofSerial _serial_walk;
 
 		void updateSerial();
@@ -102,5 +105,8 @@ class ofApp : public ofBaseApp{
 		bool _bgm_dir;
 
 
+		//udp
+		ofxUDPManager	_udp;
+		
 
 };

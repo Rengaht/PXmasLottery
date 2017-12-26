@@ -19,10 +19,10 @@ void ofApp::setup(){
 		_vel_roll[i]=ofRandom(1,2)*.002;
 	}
 
-	ofAddListener(_timer_roll[2].finish_event,this,&ofApp::onRollEnd);
+	//ofAddListener(_timer_roll[2].finish_event,this,&ofApp::onRollEnd);
 
 	_timer_final=FrameTimer(_param->_time_final);
-	ofAddListener(_timer_final.finish_event,this,&ofApp::onFinalEnd);
+	//ofAddListener(_timer_final.finish_event,this,&ofApp::onFinalEnd);
 
 
 	_cur_millis=ofGetElapsedTimeMillis();
@@ -34,7 +34,13 @@ void ofApp::setup(){
 
 	//setup serial
 	_serial_balloon.setup(_param->_port_balloon,9600);
-	_serial_light.setup(_param->_port_light,9600);
+	//_serial_light.setup(_param->_port_light,9600);
+	for(int i=0;i<_param->_port_light.size();++i){
+		ofSerial* serial_=new ofSerial();
+		serial_->setup(_param->_port_light[i],9600);
+		_serial_light.push_back(serial_);
+	}
+
 	_serial_walk.setup(_param->_port_walk,9600);
 
 	//setup mask
@@ -74,6 +80,13 @@ void ofApp::setup(){
 	_timer_bgm=FrameTimer(3000);
 
 
+	//connect
+	_udp.Create();
+	_udp.Connect("127.0.0.1",11999);
+	_udp.SetNonBlocking(true);
+
+
+
 	changeMode(LMODE::SLEEP);
 	
 
@@ -102,6 +115,12 @@ void ofApp::update(){
 				//cout<<_pos_roll[i]<<" ";
 				//if(i==0) cout<<_pos_roll[i]<<endl;
 			}
+			if(_timer_roll[2].val()==1){
+				sendPrint(_print_text);
+				_wait_print=false;
+				
+				changeMode(LMODE::FINAL);
+			}
 		//	cout<<endl;
 			break;
 		case FINAL:			
@@ -110,6 +129,10 @@ void ofApp::update(){
 				_timer_blink[i].update(dm);
 			}
 			_timer_final.update(dm);			
+			if(_timer_final.val()==1){
+				changeMode(LMODE::SLEEP);
+				_timer_final.reset();
+			}
 			break;
 	}
 	
@@ -182,6 +205,7 @@ void ofApp::changeMode(LMODE set_){
 				_timer_roll[i].reset();
 				_timer_blink[i].restart();
 			}
+			_timer_final.setDue(_param->_time_final);
 			_timer_final.restart();
 
 			_timer_bgm.reset();		
@@ -193,20 +217,20 @@ void ofApp::changeMode(LMODE set_){
 
 
 void ofApp::onRollEnd(int &data){
-	if(_mode==LMODE::ROLL){
-			
-  		if(_wait_print){
-			sendPrint(_print_text);
-			_wait_print=false;
-		}
+	//if(_mode==LMODE::ROLL){
+	//		
+ // 		if(_wait_print){
+	//		sendPrint(_print_text);
+	//		_wait_print=false;
+	//	}
 
-		changeMode(LMODE::FINAL);
-	}
+	//	changeMode(LMODE::FINAL);
+	//}
 }
 void ofApp::onFinalEnd(int &data){
-	changeMode(LMODE::SLEEP);
+	/*changeMode(LMODE::SLEEP);
 
-	_timer_final.reset();
+	_timer_final.reset();*/
 }
 
 //--------------------------------------------------------------
@@ -289,6 +313,10 @@ void ofApp::keyPressed(int key){
 		case 'f':
 		case 'F':
 			ofToggleFullscreen();
+			break;
+		case 't':
+			int i=floor(ofRandom(_param->_prize_print.size()));
+			sendPrint(_param->_prize_print[i]);
 			break;
 	}
 }
@@ -399,7 +427,9 @@ void ofApp::setPrize(string prize_){
 						+(i+_param->_mrolling)*_param->_mprize+dest_;		
 		}
 		sendBalloon(false);
-		_wait_print=false;
+		_wait_print=true;
+		_print_text=_param->_xmas_string;
+
 		_got_prize=-1;
 	}
 
@@ -415,11 +445,12 @@ void ofApp::setPrize(string prize_){
 
 void ofApp::sendPrint(wstring prize_){
 
-	if(prize_.size()<1) return;
-
-	std::ofstream f(_param->_print_folder+ofGetTimestampString(), ios_base::binary);
+	/*std::ofstream f(_param->_print_folder+ofGetTimestampString(), ios_base::binary);
 	f<<_param->ws2utf8(prize_);
-	f.close();
+	f.close();*/
+	string str=_param->ws2utf8(prize_);
+	_udp.Send(str.c_str(),str.length());
+
 }
 
 void ofApp::sendBalloon(bool up_){
@@ -433,16 +464,20 @@ void ofApp::sendBalloon(bool up_){
 void ofApp::sendLight(LMODE mode_){
 	switch(mode_){
 		case SLEEP:
-			_serial_light.writeByte('c');
+			for(int i=0;i<_serial_light.size();++i)
+				_serial_light[i]->writeByte('c');
 			break;
 		case ROLL:
-			_serial_light.writeByte('e');
+			for(int i=0;i<_serial_light.size();++i)
+				_serial_light[i]->writeByte('e');
 			break;
 		case WIN:
-			_serial_light.writeByte('a');
+			for(int i=0;i<_serial_light.size();++i)
+				_serial_light[i]->writeByte('f');
 			break;
 		case LOSE:
-			_serial_light.writeByte('b');
+			for(int i=0;i<_serial_light.size();++i)
+				_serial_light[i]->writeByte('b');
 			break;	
 	}
 }
